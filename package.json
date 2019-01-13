@@ -1,0 +1,32 @@
+{
+  "name": "delaunay",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "npm run sass && npm run js -- --mode=production",
+    "deploy": "npm run build && now && now alias",
+    "sass": "node-sass -r -o dist styles | postcss dist/styles.css -u autoprefixer -r",
+    "sass-watch": "watch 'npm run sass' styles",
+    "js": "webpack",
+    "js-watch": "webpack -w"
+  },
+  "author": "Ignacio Piantanida",
+  "license": "MIT",
+  "dependencies": {
+    "autoprefixer": "^9.4.5",
+    "node-sass": "^4.11.0",
+    "postcss": "^7.0.11",
+    "postcss-cli": "^6.1.1",
+    "seedrandom": "^3.0.5",
+    "watch": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/seedrandom": "^2.4.28",
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.6.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  }
+}

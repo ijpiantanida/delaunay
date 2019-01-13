@@ -1,0 +1,22 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/dist/img/favicon.ico">
+  <link rel="stylesheet" type="text/css" href="/dist/triangulate.css">
+  <script src="dist/js/triangulate.js"></script>
+
+  <title>Delaunay</title>
+</head>
+<body id="sketch">
+  <canvas id="container"></canvas>
+  <div id="parameters">
+    <label for="density">Density:</label>
+    <input type="range" min="20" max="1000" class="slider" id="density">
+    <label for="distance">Distance:</label>
+    <input type="range" min="10" max="300" class="slider" id="distance">
+    <label for="fill">Fill:</label>
+    <input type="checkbox" name="fill" id="fill">
+    <button type="submit">Set</button>
+  </div>
+</body>
+</html>
