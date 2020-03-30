@@ -1,4 +1,4 @@
-type RGBColor = number[]
+export type RGBColor = number[]
 
 export default class Gradient {
   private colors: RGBColor[]

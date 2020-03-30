@@ -2,6 +2,7 @@ import Line from "./line"
 import Particle from "./particle"
 import Sketch from "./delaunaySketch"
 import Config from "../config"
+import {RGBColor} from "./gradient"
 
 export default class Triangle {
   l1: Line
@@ -66,9 +67,14 @@ export default class Triangle {
     }
     ctx.closePath()
 
-
+    let fillColorRGB: RGBColor
     if (Config.colors.fill) {
-      const fillColorRGB = Config.colors.gradient.colorFor(center.x)
+      if (sketch.mesher) {
+        const pixelData = sketch.mesher.getPixel(center.x, center.y)
+        fillColorRGB = [pixelData[0], pixelData[1], pixelData[2]]
+      } else {
+        fillColorRGB = Config.colors.gradient.colorFor(center.x)
+      }
       const fillColorS = "rgb(" + fillColorRGB[0] + "," + fillColorRGB[1] + "," + fillColorRGB[2] + ")"
       ctx.fillStyle = fillColorS
       ctx.fill()

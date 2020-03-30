@@ -1,11 +1,21 @@
-import seedrandom from 'seedrandom';
+import seedrandom from "seedrandom"
 
-const urlParams = new URLSearchParams(window.location.search)
-const seed = urlParams.get("seed") || undefined
-const rng = seedrandom(seed)
+class Random {
+  private rng: seedrandom.prng
 
-export default {
+  constructor() {
+    this.setSeed()
+  }
+
+  setSeed() {
+    const urlParams = new URLSearchParams(window.location.search)
+    const seed = urlParams.get("seed") || undefined
+    this.rng = seedrandom(seed)
+  }
+
   max(max: number) {
-    return rng.double() * max
+    return this.rng.double() * max
   }
 }
+
+export default new Random()

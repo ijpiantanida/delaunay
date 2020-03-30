@@ -3,6 +3,7 @@ import Line from "./line"
 import Triangle from "./triangle"
 import random from "../random"
 import Config from "../config"
+import ImageMesher from "./imageMesher"
 
 export default class DelaunaySketch {
   container: HTMLElement
@@ -23,16 +24,14 @@ export default class DelaunaySketch {
     mouseXPx: number,
     mouseYPx: number
   }
+  mesher?: ImageMesher
 
-  static draw(container: HTMLCanvasElement) {
-    return new DelaunaySketch(container)
-  }
-
-  constructor(container: HTMLCanvasElement) {
+  constructor(container: HTMLCanvasElement, mesher?: ImageMesher) {
     this.container = container
     this.setupCanvas(container)
     this.containerWidth = container.clientWidth
     this.containerHeight = container.clientHeight
+    this.mesher = mesher
 
     this.urlParams = new URLSearchParams(window.location.search)
 
@@ -41,7 +40,7 @@ export default class DelaunaySketch {
       mouseYPx: 0
     }
 
-    container.addEventListener("mousemove", this.onMouseMove.bind(this))
+    // container.addEventListener("mousemove", this.onMouseMove.bind(this))
 
     this.set()
   }
@@ -86,6 +85,13 @@ export default class DelaunaySketch {
   }
 
   set() {
+    if (this.mesher) {
+      if (!this.mesher.loaded) {
+        return this
+      }
+    }
+    random.setSeed()
+
     Config.colors.gradient.precalculate(this.containerWidth)
 
     const {minDist2, nParticles} = this.calculateParametersFromCanvasSize()
@@ -274,10 +280,12 @@ export default class DelaunaySketch {
     const ctx = this.context!
     ctx.clearRect(0, 0, this.containerWidth, this.containerHeight)
 
+    // console.debug("Gonna render triangles", this.triangles)
     this.triangles.forEach(t => t.draw(ctx, this))
     // this.lines.forEach(t => t.draw(ctx, this))
 
     if (!Config.colors.fill) {
+      // console.debug("Gonna render particles")
       this.particles.forEach(p => p.draw(ctx, this))
     }
 
@@ -288,42 +296,55 @@ export default class DelaunaySketch {
   }
 
   triangulateNoDelaunay() {
-    const sorted = [...this.particles.sort((p1, p2) => p1.x > p2.x ? 1 : -1)];
-    const visited = [] as Particle[];
+    const sorted = [...this.particles.sort((p1, p2) => p1.x > p2.x ? 1 : -1)]
+    const visited = [] as Particle[]
 
-    const p1 = sorted.shift()!;
-    const p2 = sorted.shift()!;
-    const p3 = sorted.shift()!;
+    const p1 = sorted.shift()!
+    const p2 = sorted.shift()!
+    const p3 = sorted.shift()!
 
-    const l1 = new Line(p1, p2);
-    const l2 = new Line(p1, p3);
-    const l3 = new Line(p2, p3);
+    const l1 = new Line(p1, p2)
+    const l2 = new Line(p1, p3)
+    const l3 = new Line(p2, p3)
 
-    this.lines.push(l1);
-    this.lines.push(l2);
-    this.lines.push(l3);
+    this.lines.push(l1)
+    this.lines.push(l2)
+    this.lines.push(l3)
 
-    const triangle = new Triangle(l1, l2, l3);
-    this.triangles.push(triangle);
+    const triangle = new Triangle(l1, l2, l3)
+    this.triangles.push(triangle)
 
-    visited.push(p1);
-    visited.push(p3);
-    visited.push(p2);
+    visited.push(p1)
+    visited.push(p3)
+    visited.push(p2)
 
-    let p: Particle | undefined;
-    while(p = sorted.shift()) {
-      this.addLinesFor(p, visited);
-      visited.push(p);
+    let p: Particle | undefined
+    while (p = sorted.shift()) {
+      this.addLinesFor(p, visited)
+      visited.push(p)
     }
   }
 
   addLinesFor(p: Particle, visited: Particle[]) {
+    const linesToAdd = [] as Line[]
+    const trianglesToAdd = [] as Triangle[]
     visited.forEach(p2 => {
-      const newLine = new Line(p, p2);
-      const anyIntersects = this.lines.find(l => l.intersect(newLine));
-      if(!anyIntersects) {
-        this.lines.push(newLine);
+      const lineToAdd = new Line(p, p2)
+      const anyIntersects = this.lines.find(l => l.intersect(lineToAdd))
+      if (!anyIntersects) {
+        linesToAdd.forEach(previousLineToAdd => {
+          const otherParticle = previousLineToAdd.otherParticle(p)
+          const requiredLine = new Line(p2, otherParticle)
+          const closingLine = this.lines.find(l => l.equal(requiredLine))
+          if (closingLine) {
+            const triangleToAdd = new Triangle(lineToAdd, closingLine, previousLineToAdd)
+            trianglesToAdd.push(triangleToAdd)
+          }
+        })
+        linesToAdd.push(lineToAdd)
       }
-    });
+    })
+    this.lines = this.lines.concat(linesToAdd)
+    this.triangles = this.triangles.concat(trianglesToAdd)
   }
 }

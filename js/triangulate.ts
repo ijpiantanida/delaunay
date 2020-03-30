@@ -1,9 +1,18 @@
 import Config from "./config"
 import Sketch from "./model/delaunaySketch"
+import ImageMesher from "./model/imageMesher"
 
 window.onload = () => {
   const container = document.getElementById("container") as HTMLCanvasElement
-  const sketch = Sketch.draw(container)
+
+  let sketch: Sketch
+  if (Config.colors.mesh) {
+    const imageMesher = new ImageMesher("/dist/img/walle.jpg", container)
+    sketch = new Sketch(container, imageMesher)
+    imageMesher.onLoad(() => sketch.set())
+  } else {
+    sketch = new Sketch(container)
+  }
 
   const parameters = document.querySelector("#parameters")
   const densityInput = parameters.querySelector("#density") as HTMLInputElement

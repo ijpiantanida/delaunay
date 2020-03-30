@@ -30,19 +30,26 @@ export default class Line {
   }
 
   intersect(other: Line) {
-    if(this.a == other.a || this.a == other.b || this.b == other.a || this.b == other.b) {
-      return false;
+    if (this.a == other.a || this.a == other.b || this.b == other.a || this.b == other.b) {
+      return false
     }
-    return this.lineIntersect(this.a.x, this.a.y, this.b.x, this.b.y, other.a.x, other.a.y, other.b.x, other.b.y);
+    return this.lineIntersect(this.a.x, this.a.y, this.b.x, this.b.y, other.a.x, other.a.y, other.b.x, other.b.y)
   }
 
-  lineIntersect(x1: number,y1: number,x2: number,y2: number, x3: number,y3: number,x4: number,y4: number) {
-    var a_dx = x2 - x1;
-    var a_dy = y2 - y1;
-    var b_dx = x4 - x3;
-    var b_dy = y4 - y3;
-    var s = (-a_dy * (x1 - x3) + a_dx * (y1 - y3)) / (-b_dx * a_dy + a_dx * b_dy);
-    var t = (+b_dx * (y1 - y3) - b_dy * (x1 - x3)) / (-b_dx * a_dy + a_dx * b_dy);
-    return (s >= 0 && s <= 1 && t >= 0 && t <= 1);
+  otherParticle(p: Particle) {
+    if (p == this.a) {
+      return this.b
+    }
+    return this.a
+  }
+
+  lineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number) {
+    var a_dx = x2 - x1
+    var a_dy = y2 - y1
+    var b_dx = x4 - x3
+    var b_dy = y4 - y3
+    var s = (-a_dy * (x1 - x3) + a_dx * (y1 - y3)) / (-b_dx * a_dy + a_dx * b_dy)
+    var t = (+b_dx * (y1 - y3) - b_dy * (x1 - x3)) / (-b_dx * a_dy + a_dx * b_dy)
+    return (s >= 0 && s <= 1 && t >= 0 && t <= 1)
   }
 }
