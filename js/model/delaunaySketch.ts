@@ -6,6 +6,8 @@ import Config from "../config"
 import ImageMesher from "./imageMesher"
 import Circle from "./circle"
 
+const CIRCLE_RADIUS = 200
+
 export default class DelaunaySketch {
   container: HTMLElement
   N_PARTICLES: number
@@ -27,6 +29,7 @@ export default class DelaunaySketch {
   mesher: ImageMesher
   private onTriangulateCallback?: () => void
   random: Random
+  private mouseCircleEl: HTMLElement
 
   constructor(container: HTMLCanvasElement, mesher: ImageMesher) {
     this.random = new Random()
@@ -38,13 +41,19 @@ export default class DelaunaySketch {
 
     this.urlParams = new URLSearchParams(window.location.search)
 
+    this.mouseCircleEl = document.getElementById("mouse-circle")
+    this.mouseCircleEl.style.height = (CIRCLE_RADIUS * 2).toString()
+    this.mouseCircleEl.style.width = (CIRCLE_RADIUS * 2).toString()
+    this.mouseCircleEl.style.borderRadius = CIRCLE_RADIUS.toString() + "px"
+
     this.state = {
       mouseXPx: 0,
       mouseYPx: 0
     }
-
-    // container.addEventListener("mousemove", this.onMouseMove.bind(this))
+    container.addEventListener("mousemove", this.onMouseMove.bind(this))
     container.addEventListener("click", this.onMouseClick.bind(this))
+    document.addEventListener("keydown", this.onKeyDown.bind(this))
+    document.addEventListener("keyup", this.onKeyUp.bind(this))
   }
 
   calculateParametersFromCanvasSize() {
@@ -78,26 +87,30 @@ export default class DelaunaySketch {
     const mouseX = ev.clientX - rect.left //x position within the element.
     const mouseY = ev.clientY - rect.top
 
+    const circle = new Circle(mouseX, mouseY, CIRCLE_RADIUS)
+    const addParticles = (numberOfNewParticles: number) => {
+      for (let i = 0; i < numberOfNewParticles; i++) {
+        const particleToAdd = circle.getRandomPoint(this.random)
+        this.particles.push(particleToAdd)
+      }
+    }
 
     if (ev.shiftKey) {
-      const circle = new Circle(mouseX, mouseY, 200)
+      const sizeBeforeRemove = this.particles.length
       this.particles = this.particles.filter(p => !circle.contains(p))
+      const numberOfNewParticles = Math.floor((sizeBeforeRemove - this.particles.length) / 2)
+      addParticles(numberOfNewParticles)
     } else {
       if (ev.altKey) {
-        const numberOfNewParticles = 250
-        const circle = new Circle(mouseX, mouseY, 300)
-        for (let i = 0; i < numberOfNewParticles; i++) {
-          const x = this.random.max(circle.radius)
-          const y = this.random.max(circle.radius)
-          const particleToAdd = new Particle(Math.floor(mouseX - circle.radius / 2 + x), Math.floor(mouseY - circle.radius / 2 + y))
-          this.particles.push(particleToAdd)
-        }
+        const includedInCircle = this.particles.filter(p => circle.contains(p)).length
+        const numberOfNewParticles = Math.max(Math.min(includedInCircle, 1), 100)
+        addParticles(numberOfNewParticles)
       } else {
         this.particles.push(new Particle(mouseX, mouseY))
       }
     }
 
-    this.calculateAndDraw();
+    this.calculateAndDraw()
   }
 
   onMouseMove(ev: MouseEvent) {
@@ -110,7 +123,11 @@ export default class DelaunaySketch {
       mouseXPx: mouseX,
       mouseYPx: mouseY
     }
-    this.draw()
+
+    this.mouseCircleEl.style.left = (mouseX - this.mouseCircleEl.clientWidth / 2).toString()
+    this.mouseCircleEl.style.top = (mouseY - this.mouseCircleEl.clientHeight / 2).toString()
+
+    this.toggleMouseCircle(ev)
   }
 
   reset() {
@@ -382,5 +399,21 @@ export default class DelaunaySketch {
 
   onTriangulate(callback: () => void) {
     this.onTriangulateCallback = callback
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    this.toggleMouseCircle(event)
+  }
+
+  onKeyUp(event: KeyboardEvent) {
+    this.toggleMouseCircle(event)
+  }
+
+  private toggleMouseCircle(event: KeyboardEvent | MouseEvent) {
+    if (event.shiftKey || event.altKey) {
+      this.mouseCircleEl.style.visibility = "inherit"
+    } else {
+      this.mouseCircleEl.style.visibility = "hidden"
+    }
   }
 }

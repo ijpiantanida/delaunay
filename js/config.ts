@@ -4,12 +4,12 @@ const Config = {
   FPS: 60,
   parameters: {
     delaunay: true,
-    density: 200,
+    density: 1000,
     minDistFactor: 10
   },
   imageMesh: {
     enabled: true,
-    sourcePath: "/dist/img/portrait.png",
+    sourcePath: "/dist/img/la.jpg",
     sourceOpacity: 0
   },
   colors: {

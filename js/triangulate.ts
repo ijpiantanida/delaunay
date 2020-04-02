@@ -15,7 +15,7 @@ function takeSnapshot(videoFeed: videoFeed) {
 
 window.onload = () => {
   setWindowProperties()
-  const container = document.getElementById("container") as HTMLCanvasElement
+  const container = document.getElementById("canvas") as HTMLCanvasElement
   const imageMesher = new ImageMesher(Config.imageMesh.sourcePath, container)
 
   const sketch = new Sketch(container, imageMesher)

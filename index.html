@@ -8,11 +8,15 @@
   <title>Delaunay</title>
 </head>
 <body id="sketch">
-  <div>
+  <div id="container">
     <video id="video" playsinline autoplay></video>
-    <canvas id="container"></canvas>
+    <canvas id="canvas">
+    </canvas>
+    <div id="mouse-circle"></div>
   </div>
+  <div id="open-parameters-button">X</div>
   <div id="parameters">
+    <button id="close-parameters-button">X</button>
     <div>
       <label for="seed">Seed:</label>
       <input type="text" id="seed">

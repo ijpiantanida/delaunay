@@ -17,11 +17,18 @@ export default class Parameters {
   private mesherEnabledInputEl: HTMLInputElement
   private currentMesherImageSrc: string
   private videoFeed: VideoFeed
+  private openButtonEl: HTMLElement
+  private closeButtonEl: HTMLElement
 
   constructor(sketch: DelaunaySketch, videoFeed: VideoFeed) {
     this.sketch = sketch
     this.videoFeed = videoFeed
     this.parametersEl = document.querySelector("#parameters")
+
+    this.openButtonEl = document.getElementById("open-parameters-button")
+    this.closeButtonEl = document.getElementById("close-parameters-button")
+    this.openButtonEl.addEventListener("click", this.toggleParametersOpen.bind(this))
+    this.closeButtonEl.addEventListener("click", this.toggleParametersOpen.bind(this))
 
     this.densityInputEl = this.parametersEl.querySelector("#density")
     this.distanceInputEl = this.parametersEl.querySelector("#distance")
@@ -55,12 +62,12 @@ export default class Parameters {
 
   onSetClick() {
     Config.colors.fill = this.fillInputEl.checked
-    Config.imageMesh.sourceOpacity = parseInt(this.mesherImageOpacityEl.value)/100
+    Config.imageMesh.sourceOpacity = parseInt(this.mesherImageOpacityEl.value) / 100
     Config.imageMesh.enabled = this.mesherEnabledInputEl.checked
 
     this.sketch.draw()
 
-    if(this.mesherImageSrcEl.value && this.currentMesherImageSrc != this.mesherImageSrcEl.value) {
+    if (this.mesherImageSrcEl.value && this.currentMesherImageSrc != this.mesherImageSrcEl.value) {
       this.currentMesherImageSrc = this.mesherImageSrcEl.value
       this.sketch.mesher.loadImage(this.mesherImageSrcEl.files[0])
     }
@@ -92,6 +99,17 @@ export default class Parameters {
   }
 
   onToggleVideoClick() {
-    this.videoFeed.toggleRecording();
+    this.videoFeed.toggleRecording()
+  }
+
+  toggleParametersOpen() {
+    console.log("toggling", this.parametersEl.style.visibility)
+    if (this.parametersEl.style.visibility == "hidden") {
+      this.parametersEl.style.visibility = "inherit"
+      this.openButtonEl.style.visibility = "hidden"
+    } else {
+      this.parametersEl.style.visibility = "hidden"
+      this.openButtonEl.style.visibility = "inherit"
+    }
   }
 }

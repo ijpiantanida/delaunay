@@ -3,6 +3,10 @@
 }
 
 #container {
+  position: relative;
+}
+
+#canvas {
   height: 100%;
   width: 100%;
 }
@@ -27,4 +31,37 @@
   position: absolute;
   transform: scaleX(-1);
   width: 0;
+}
+
+#mouse-circle {
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid red;
+  position: absolute;
+  pointer-events: none;
+}
+
+#open-parameters-button {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  background-color: rebeccapurple;
+  height: 20px;
+  width: 20px;
+
+  visibility: hidden;
+}
+
+#close-parameters-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+#parameters {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+
+  background-color: white;
+  padding: 3px;
 }
