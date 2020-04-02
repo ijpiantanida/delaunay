@@ -22,3 +22,9 @@
   left: 0;
   pointer-events: none;
 }
+
+#video {
+  position: absolute;
+  transform: scaleX(-1);
+  width: 0;
+}

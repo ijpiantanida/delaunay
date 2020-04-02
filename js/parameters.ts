@@ -1,5 +1,6 @@
 import Config from "./config"
 import DelaunaySketch from "./model/delaunaySketch"
+import VideoFeed from "./model/videoFeed"
 
 export default class Parameters {
   private parametersEl: HTMLDivElement
@@ -15,9 +16,11 @@ export default class Parameters {
   private delaunayInputEl: HTMLInputElement
   private mesherEnabledInputEl: HTMLInputElement
   private currentMesherImageSrc: string
+  private videoFeed: VideoFeed
 
-  constructor(sketch: DelaunaySketch) {
+  constructor(sketch: DelaunaySketch, videoFeed: VideoFeed) {
     this.sketch = sketch
+    this.videoFeed = videoFeed
     this.parametersEl = document.querySelector("#parameters")
 
     this.densityInputEl = this.parametersEl.querySelector("#density")
@@ -44,6 +47,8 @@ export default class Parameters {
 
     this.parametersEl.querySelector("#redraw").addEventListener("click", this.onSetClick.bind(this))
     this.parametersEl.querySelector("#reset").addEventListener("click", this.onResetClick.bind(this))
+    this.parametersEl.querySelector("#snapshot").addEventListener("click", this.onSnapshotClick.bind(this))
+    this.parametersEl.querySelector("#toggle-video").addEventListener("click", this.onToggleVideoClick.bind(this))
 
     sketch.onTriangulate(this.onSketchRender.bind(this))
   }
@@ -53,7 +58,7 @@ export default class Parameters {
     Config.imageMesh.sourceOpacity = parseInt(this.mesherImageOpacityEl.value)/100
     Config.imageMesh.enabled = this.mesherEnabledInputEl.checked
 
-    this.sketch.calculateAndDraw()
+    this.sketch.draw()
 
     if(this.mesherImageSrcEl.value && this.currentMesherImageSrc != this.mesherImageSrcEl.value) {
       this.currentMesherImageSrc = this.mesherImageSrcEl.value
@@ -79,5 +84,14 @@ export default class Parameters {
   onSketchRender() {
     this.pointsCount.textContent = this.sketch.particles.length.toString()
     this.trianglesCount.textContent = this.sketch.triangles.length.toString()
+  }
+
+  onSnapshotClick() {
+    this.videoFeed.stopRecording()
+    this.videoFeed.snapshot()
+  }
+
+  onToggleVideoClick() {
+    this.videoFeed.toggleRecording();
   }
 }

@@ -3,6 +3,15 @@ import Sketch from "./model/delaunaySketch"
 import ImageMesher from "./model/imageMesher"
 import setWindowProperties from "./window"
 import Parameters from "./parameters"
+import VideoFeed from "./model/videoFeed"
+import videoFeed from "./model/videoFeed"
+
+function takeSnapshot(videoFeed: videoFeed) {
+  setTimeout(() => {
+    videoFeed.snapshot()
+    takeSnapshot(videoFeed)
+  }, 200)
+}
 
 window.onload = () => {
   setWindowProperties()
@@ -12,7 +21,9 @@ window.onload = () => {
   const sketch = new Sketch(container, imageMesher)
   imageMesher.onLoad(() => sketch.draw())
 
-  const parameters = new Parameters(sketch)
+  const videoFeed = new VideoFeed(imageMesher)
+
+  const parameters = new Parameters(sketch, videoFeed)
 
   sketch.reset()
 }
