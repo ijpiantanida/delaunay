@@ -2,8 +2,7 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    triangulate: './js/triangulate.ts',
-    quadratic: './js/quadratic.ts'
+    triangulate: './js/triangulate.ts'
   },
   mode: "development",
   module: {

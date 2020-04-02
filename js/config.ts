@@ -3,11 +3,16 @@ import Gradient from "./model/gradient"
 const Config = {
   FPS: 60,
   parameters: {
-    density: 500,
+    delaunay: true,
+    density: 200,
     minDistFactor: 10
   },
+  imageMesh: {
+    enabled: true,
+    sourcePath: "/dist/img/portrait.png",
+    sourceOpacity: 0
+  },
   colors: {
-    mesh: false,
     fill: true,
     gradient: new Gradient([[30, 34, 86], [105, 181, 225], [105, 0, 225], [255, 255, 255]]),
     background: "#000",

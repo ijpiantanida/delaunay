@@ -32,12 +32,22 @@ export default class Triangle {
   }
 
   contains(p: Particle) {
-    const A = 1 / 2 * (-this.p2.y * this.p3.x + this.p1.y * (-this.p2.x + this.p3.x) + this.p1.x * (this.p2.y - this.p3.y) + this.p2.x * this.p3.y)
-    const sign = A < 0 ? -1 : 1
-    const s = (this.p1.y * this.p3.x - this.p1.x * this.p3.y + (this.p3.y - this.p1.y) * p.x + (this.p1.x - this.p3.x) * p.y) * sign
-    const t = (this.p1.x * this.p2.y - this.p1.y * this.p2.x + (this.p1.y - this.p2.y) * p.x + (this.p2.x - this.p1.x) * p.y) * sign
+    const o1 = this.getOrientationResult(this.p1.x, this.p1.y, this.p2.x, this.p2.y, p.x, p.y)
+    const o2 = this.getOrientationResult(this.p2.x, this.p2.y, this.p3.x, this.p3.y, p.x, p.y)
+    const o3 = this.getOrientationResult(this.p3.x, this.p3.y, this.p1.x, this.p1.y, p.x, p.y)
 
-    return s > 0 && t > 0 && (s + t) < 2 * A * sign
+    return (o1 == o2) && (o2 == o3);
+  }
+
+  getOrientationResult(x1: number, y1: number, x2: number, y2: number, px: number, py: number) {
+    const orientation = ((x2 - x1) * (py - y1)) - ((px - x1) * (y2 - y1))
+    if (orientation > 0) {
+      return 1
+    } else if (orientation < 0) {
+      return -1
+    } else {
+      return 0
+    }
   }
 
   lines() {
@@ -69,20 +79,31 @@ export default class Triangle {
 
     let fillColorRGB: RGBColor
     if (Config.colors.fill) {
-      if (sketch.mesher) {
+      if (Config.imageMesh.enabled && sketch.mesher.loaded) {
         const pixelData = sketch.mesher.getPixel(center.x, center.y)
         fillColorRGB = [pixelData[0], pixelData[1], pixelData[2]]
+
+        const pixelsToAverage = []
+        pixelsToAverage.push(sketch.mesher.getPixel(center.x, center.y))
+        pixelsToAverage.push(sketch.mesher.getPixel(this.p1.x, this.p1.y))
+        pixelsToAverage.push(sketch.mesher.getPixel(this.p2.x, this.p2.y))
+        pixelsToAverage.push(sketch.mesher.getPixel(this.p3.x, this.p3.y))
+
+        const squared = pixelsToAverage.reduce((previous, current) => {
+          return [previous[0] + current[0]**2, previous[1] + current[1]**2, previous[2] + current[2]**2, previous[3] + current[3]**2]
+        }, [0,0,0,0])
+
+        const averageColor = [Math.sqrt(squared[0]/ pixelsToAverage.length), Math.sqrt(squared[1]/ pixelsToAverage.length), Math.sqrt(squared[2]/ pixelsToAverage.length), Math.sqrt(squared[3]/ pixelsToAverage.length)]
+        fillColorRGB = [averageColor[0], averageColor[1], averageColor[2]]
       } else {
         fillColorRGB = Config.colors.gradient.colorFor(center.x)
       }
-      const fillColorS = "rgb(" + fillColorRGB[0] + "," + fillColorRGB[1] + "," + fillColorRGB[2] + ")"
-      ctx.fillStyle = fillColorS
+      ctx.fillStyle = "rgb(" + fillColorRGB[0] + "," + fillColorRGB[1] + "," + fillColorRGB[2] + ")"
       ctx.fill()
     } else {
       ctx.lineWidth = 2
       ctx.strokeStyle = Config.colors.lines
       ctx.stroke()
     }
-
   }
 }

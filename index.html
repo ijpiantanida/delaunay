@@ -2,21 +2,46 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/dist/img/favicon.ico">
-  <link rel="stylesheet" type="text/css" href="/dist/triangulate.css">
+  <link rel="stylesheet" type="text/css" href="/dist/styles.css">
   <script src="dist/js/triangulate.js"></script>
 
   <title>Delaunay</title>
 </head>
 <body id="sketch">
-  <canvas id="container"></canvas>
+  <div>
+    <canvas id="container"></canvas>
+  </div>
   <div id="parameters">
-    <label for="density">Density:</label>
-    <input type="range" min="20" max="1000" class="slider" id="density">
-    <label for="distance">Distance:</label>
-    <input type="range" min="10" max="300" class="slider" id="distance">
-    <label for="fill">Fill:</label>
-    <input type="checkbox" name="fill" id="fill">
-    <button type="submit">Set</button>
+    <div>
+      <label for="density">Density:</label>
+      <input type="text" id="density">
+      <label for="distance">Distance:</label>
+      <input type="text" id="distance">
+      <label for="delaunay">Delaunay:</label>
+      <input type="checkbox" name="delaunay" id="delaunay">
+      <button type="submit" id="reset">Reset</button>
+    </div>
+    <div>
+      <label for="mesher-enabled">Image Enabled:</label>
+      <input type="checkbox" name="mesher-enabled" id="mesher-enabled">
+      <label for="mesher-image-opacity">Opacity:</label>
+      <input type="range" min="0" max="100" id="mesher-image-opacity">
+      <label for="mesher-image-src">Choose image:</label>
+      <input type="file" id="mesher-image-src" name="mesher-image-src" accept="image/png, image/jpeg">
+    </div>
+    <div>
+      <label for="seed">Seed:</label>
+      <input type="text" id="seed">
+      <label for="count-points">Points:</label>
+      <span id="count-points"></span>
+      <label for="count-triangles">Triangles:</label>
+      <span id="count-triangles"></span>
+    </div>
+    <div>
+      <label for="fill">Fill:</label>
+      <input type="checkbox" name="fill" id="fill">
+      <button type="submit" id="redraw">Redraw</button>
+    </div>
   </div>
 </body>
 </html>

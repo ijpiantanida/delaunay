@@ -1,15 +1,15 @@
 import Particle from "./particle"
 import Line from "./line"
 import Triangle from "./triangle"
-import random from "../random"
+import Random from "../random"
 import Config from "../config"
 import ImageMesher from "./imageMesher"
+import Circle from "./circle"
 
 export default class DelaunaySketch {
   container: HTMLElement
   N_PARTICLES: number
   minDist2: number
-  foundParticlesN: number
   containerHeight: any
   containerWidth: any
 
@@ -24,9 +24,12 @@ export default class DelaunaySketch {
     mouseXPx: number,
     mouseYPx: number
   }
-  mesher?: ImageMesher
+  mesher: ImageMesher
+  private onTriangulateCallback?: () => void
+  random: Random
 
-  constructor(container: HTMLCanvasElement, mesher?: ImageMesher) {
+  constructor(container: HTMLCanvasElement, mesher: ImageMesher) {
+    this.random = new Random()
     this.container = container
     this.setupCanvas(container)
     this.containerWidth = container.clientWidth
@@ -41,8 +44,7 @@ export default class DelaunaySketch {
     }
 
     // container.addEventListener("mousemove", this.onMouseMove.bind(this))
-
-    this.set()
+    container.addEventListener("click", this.onMouseClick.bind(this))
   }
 
   calculateParametersFromCanvasSize() {
@@ -71,6 +73,33 @@ export default class DelaunaySketch {
     return ctx
   }
 
+  onMouseClick(ev: MouseEvent) {
+    const rect = (ev.target as HTMLCanvasElement).getBoundingClientRect()
+    const mouseX = ev.clientX - rect.left //x position within the element.
+    const mouseY = ev.clientY - rect.top
+
+
+    if (ev.shiftKey) {
+      const circle = new Circle(mouseX, mouseY, 200)
+      this.particles = this.particles.filter(p => !circle.contains(p))
+    } else {
+      if (ev.altKey) {
+        const numberOfNewParticles = 250
+        const circle = new Circle(mouseX, mouseY, 300)
+        for (let i = 0; i < numberOfNewParticles; i++) {
+          const x = this.random.max(circle.radius)
+          const y = this.random.max(circle.radius)
+          const particleToAdd = new Particle(Math.floor(mouseX - circle.radius / 2 + x), Math.floor(mouseY - circle.radius / 2 + y))
+          this.particles.push(particleToAdd)
+        }
+      } else {
+        this.particles.push(new Particle(mouseX, mouseY))
+      }
+    }
+
+    this.calculateAndDraw();
+  }
+
   onMouseMove(ev: MouseEvent) {
     const rect = (ev.target as HTMLCanvasElement).getBoundingClientRect()
     const mouseX = ev.clientX - rect.left //x position within the element.
@@ -84,13 +113,8 @@ export default class DelaunaySketch {
     this.draw()
   }
 
-  set() {
-    if (this.mesher) {
-      if (!this.mesher.loaded) {
-        return this
-      }
-    }
-    random.setSeed()
+  reset() {
+    this.random.setSeed()
 
     Config.colors.gradient.precalculate(this.containerWidth)
 
@@ -98,30 +122,28 @@ export default class DelaunaySketch {
     this.minDist2 = minDist2
     this.N_PARTICLES = nParticles
 
-    this.foundParticlesN = 0
-    this.particles = new Array(this.N_PARTICLES)
+    this.particles = [] as Particle[]
     this.lines = [] as Line[]
     this.triangles = [] as Triangle[]
 
     this.createParticles()
 
-    try {
-      this.triangulate()
-    } catch (e) {
-      console.log(e)
-    }
-
-    this.draw()
+    this.calculateAndDraw()
 
     return this
+  }
+
+  calculateAndDraw() {
+    this.triangulate()
+    this.draw()
   }
 
   private createParticles() {
     let found = 0
     let it = 0
     while (found < this.N_PARTICLES && it < 1e6) {
-      const x = random.max(this.containerWidth)
-      const y = random.max(this.containerHeight)
+      const x = this.random.max(this.containerWidth)
+      const y = this.random.max(this.containerHeight)
       const particle = new Particle(x, y)
 
       if (this.validParticle(found, particle)) {
@@ -135,7 +157,6 @@ export default class DelaunaySketch {
     } else {
       console.log(`Found all ${found} points`)
     }
-    this.foundParticlesN = found
   }
 
   validParticle(foundParticles: number, potentialParticle: Particle) {
@@ -150,11 +171,14 @@ export default class DelaunaySketch {
   }
 
   triangulate() {
+    console.log(`Triangulating ${this.particles.length} points`)
     this.lines = []
     this.triangles = []
 
-    // this.triangulateNoDelaunay()
-    // return
+    if (!Config.parameters.delaunay) {
+      this.triangulateNoDelaunay()
+      return
+    }
 
     const p1 = new Particle(0, 0)
     const p2 = new Particle(0, this.containerHeight * 2)
@@ -174,16 +198,19 @@ export default class DelaunaySketch {
     this.triangles.push(triangle)
     this.initialTriangle = triangle
 
-    const maxParticlesToAdd = parseInt(this.urlParams.get("upTo") || this.foundParticlesN.toString())
+    const maxParticlesToAdd = parseInt(this.urlParams.get("upTo") || this.particles.length.toString())
+
+    const particlesToRemove = [] as Particle[]
 
     for (let partIx = 0; partIx < maxParticlesToAdd; partIx++) {
       const newPoint = this.particles[partIx]
       let potentialIllegalLines = [] as Line[]
 
       const containingTriangles = this.triangles.filter(t => t.contains(newPoint))
-      if (containingTriangles.length > 1) {
-        console.error("New point contained in more than one triangle", newPoint, containingTriangles)
-        throw new Error("NewPoint contained in more than one triangle")
+      if (containingTriangles.length != 1) {
+        particlesToRemove.push(newPoint)
+        console.error("New point not contained in only one triangle", newPoint, containingTriangles)
+        // throw new Error("New point not contained in only one triangle")
       } else {
         const containingTriangle = containingTriangles[0]
 
@@ -215,8 +242,11 @@ export default class DelaunaySketch {
       }
     }
 
+    this.particles = this.particles.filter(p => !particlesToRemove.includes(p))
     this.lines = this.lines.filter(l => !initialFakePoints.includes(l.a) && !initialFakePoints.includes(l.b))
     this.triangles = this.triangles.filter(t => !initialFakePoints.find(fp => t.points().includes(fp)))
+
+    this.onTriangulateCallback?.()
   }
 
   flipIfNecessary(potentialIllegalEdge: Line, newPoint: Particle) {
@@ -277,6 +307,8 @@ export default class DelaunaySketch {
   }
 
   draw() {
+    this.mesher.draw()
+
     const ctx = this.context!
     ctx.clearRect(0, 0, this.containerWidth, this.containerHeight)
 
@@ -346,5 +378,9 @@ export default class DelaunaySketch {
     })
     this.lines = this.lines.concat(linesToAdd)
     this.triangles = this.triangles.concat(trianglesToAdd)
+  }
+
+  onTriangulate(callback: () => void) {
+    this.onTriangulateCallback = callback
   }
 }

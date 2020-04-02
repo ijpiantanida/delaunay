@@ -1,25 +1,28 @@
+import Config from "../config"
+
 export default class ImageMesher {
   private canvas?: any
   loaded: boolean
   onLoadFn?: () => void
+  private imgTag: HTMLImageElement
 
   constructor(path: string, container: HTMLElement) {
     this.loaded = false
-    const imgTag = document.createElement("IMG") as HTMLImageElement
+    this.imgTag = document.createElement("IMG") as HTMLImageElement
     const canvas = document.createElement("canvas")
+    container.parentElement.appendChild(this.imgTag)
 
-    // imgTag.width = container.clientWidth
-    // imgTag.height = container.clientHeight
-    // canvas.width = imgTag.width
-    // canvas.height = imgTag.height
+    this.imgTag.setAttribute("id", "mesher-img")
     canvas.width = container.clientWidth
     canvas.height = container.clientHeight
-    imgTag.setAttribute("src", path)
-    imgTag.style.objectFit = "contain"
-    imgTag.addEventListener("load", () => {
+    this.imgTag.width = container.clientWidth
+    this.imgTag.height = container.clientHeight
+    this.imgTag.setAttribute("src", path)
+    this.imgTag.style.objectFit = "contain"
+    this.imgTag.addEventListener("load", () => {
       console.log("ImageMesher: Finished loading image")
       this.canvas = canvas
-      drawImageInCanvas(canvas, imgTag)
+      drawImageInCanvas(canvas, this.imgTag)
 
       this.loaded = true
       if (this.onLoadFn) {
@@ -39,10 +42,31 @@ export default class ImageMesher {
     const pixelData = this.canvas!.getContext("2d").getImageData(x, y, 1, 1).data
     return pixelData
   }
+
+  draw() {
+    let opacity = 0
+    if (Config.imageMesh.enabled) {
+      opacity = Config.imageMesh.sourceOpacity
+    }
+    this.imgTag.style.opacity = opacity.toString()
+  }
+
+  loadImage(newSrc: File) {
+    const reader = new FileReader()
+
+    reader.onloadend = () => {
+      this.imgTag.src = reader.result as any
+    }
+
+    reader.readAsDataURL(newSrc)
+  }
 }
 
 function drawImageInCanvas(canvas: HTMLCanvasElement, imageObj: HTMLImageElement) {
-  const imageAspectRatio = imageObj.width / imageObj.height
+  console.log("drawImageInCanvas")
+  const context = canvas.getContext("2d")
+  context.clearRect(0, 0, canvas.width, canvas.height)
+  const imageAspectRatio = imageObj.naturalWidth / imageObj.naturalHeight
   const canvasAspectRatio = canvas.width / canvas.height
   let renderableHeight, renderableWidth, xStart, yStart
 
@@ -50,7 +74,7 @@ function drawImageInCanvas(canvas: HTMLCanvasElement, imageObj: HTMLImageElement
   // and place the image centrally along width
   if (imageAspectRatio < canvasAspectRatio) {
     renderableHeight = canvas.height
-    renderableWidth = imageObj.width * (renderableHeight / imageObj.height)
+    renderableWidth = imageObj.naturalWidth * (renderableHeight / imageObj.naturalHeight)
     xStart = (canvas.width - renderableWidth) / 2
     yStart = 0
   }
@@ -59,7 +83,7 @@ function drawImageInCanvas(canvas: HTMLCanvasElement, imageObj: HTMLImageElement
   // and place the image centrally along height
   else if (imageAspectRatio > canvasAspectRatio) {
     renderableWidth = canvas.width
-    renderableHeight = imageObj.height * (renderableWidth / imageObj.width)
+    renderableHeight = imageObj.naturalHeight * (renderableWidth / imageObj.naturalWidth)
     xStart = 0
     yStart = (canvas.height - renderableHeight) / 2
   }
@@ -71,7 +95,7 @@ function drawImageInCanvas(canvas: HTMLCanvasElement, imageObj: HTMLImageElement
     xStart = 0
     yStart = 0
   }
-  canvas.getContext("2d").drawImage(imageObj, xStart, yStart, renderableWidth, renderableHeight)
+  context.drawImage(imageObj, xStart, yStart, renderableWidth, renderableHeight)
 }
 
 
