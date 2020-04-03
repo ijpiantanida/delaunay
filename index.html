@@ -17,7 +17,7 @@
   <div id="open-parameters-button">X</div>
   <div id="parameters">
     <button id="close-parameters-button">X</button>
-    <div>
+    <div class="parameters-info params-section">
       <label for="seed">Seed:</label>
       <input type="text" id="seed">
       <label for="count-points">Points:</label>
@@ -25,7 +25,7 @@
       <label for="count-triangles">Triangles:</label>
       <span id="count-triangles"></span>
     </div>
-    <div>
+    <div class="parameters-triangulate params-section">
       <label for="density">Density:</label>
       <input type="text" id="density">
       <label for="distance">Distance:</label>
@@ -34,20 +34,18 @@
       <input type="checkbox" name="delaunay" id="delaunay">
       <button type="submit" id="reset">Reset</button>
     </div>
-    <div>
+    <div class="parameters-image params-section">
+      <label for="fill">Fill:</label>
+      <input type="checkbox" name="fill" id="fill">
       <label for="mesher-enabled">Image Enabled:</label>
       <input type="checkbox" name="mesher-enabled" id="mesher-enabled">
       <label for="mesher-image-opacity">Opacity:</label>
       <input type="range" min="0" max="100" id="mesher-image-opacity">
       <label for="mesher-image-src">Choose image:</label>
       <input type="file" id="mesher-image-src" name="mesher-image-src" accept="image/png, image/jpeg">
-    </div>
-    <div>
-      <label for="fill">Fill:</label>
-      <input type="checkbox" name="fill" id="fill">
       <button type="submit" id="redraw">Redraw</button>
     </div>
-    <div>
+    <div class="parameters-video params-section">
       <button type="submit" id="snapshot">Snapshot</button>
       <button type="submit" id="toggle-video">Toggle Video</button>
     </div>

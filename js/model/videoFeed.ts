@@ -1,4 +1,5 @@
 import ImageMesher from "./imageMesher"
+import Config from "../config"
 
 export default class VideoFeed {
   running: boolean
@@ -46,7 +47,7 @@ export default class VideoFeed {
     return setTimeout(() => {
       this.snapshot()
       this.scheduledSnapshotTimeout = this.scheduleSnapshot()
-    }, 200)
+    }, Config.video.rateMs)
   }
 
   toggleRecording() {

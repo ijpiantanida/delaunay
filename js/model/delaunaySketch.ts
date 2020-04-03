@@ -96,14 +96,11 @@ export default class DelaunaySketch {
     }
 
     if (ev.shiftKey) {
-      const sizeBeforeRemove = this.particles.length
-      this.particles = this.particles.filter(p => !circle.contains(p))
-      const numberOfNewParticles = Math.floor((sizeBeforeRemove - this.particles.length) / 2)
-      addParticles(numberOfNewParticles)
+      this.particles = this.particles.filter(p => !circle.contains(p) || this.random.max(1) > 0.5)
     } else {
       if (ev.altKey) {
         const includedInCircle = this.particles.filter(p => circle.contains(p)).length
-        const numberOfNewParticles = Math.max(Math.min(includedInCircle, 1), 100)
+        const numberOfNewParticles = Math.max(Math.min(includedInCircle, 1), 200)
         addParticles(numberOfNewParticles)
       } else {
         this.particles.push(new Particle(mouseX, mouseY))

@@ -5,12 +5,15 @@ const Config = {
   parameters: {
     delaunay: true,
     density: 1000,
-    minDistFactor: 10
+    minDistFactor: 50
   },
   imageMesh: {
-    enabled: true,
-    sourcePath: "/dist/img/la.jpg",
+    enabled: false,
+    sourcePath: "/dist/img/random.jpg",
     sourceOpacity: 0
+  },
+  video: {
+    rateMs: 100
   },
   colors: {
     fill: true,
