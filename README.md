@@ -1,6 +1,6 @@
+![Delaunay Triangulation Example](./docs/logo.png)
 # Delaunay Triangulation
 [Demo](https://delaunay.ijpiantanida.now.sh/)   
-![Delaunay Triangulation Example](./docs/logo.png)
 
 ## Development
 1. Install dependencies: `yarn`
