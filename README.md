@@ -1,11 +1,13 @@
-# Delaunay
-This is a pure static site
+# Delaunay Triangulation
+[Demo](https://delaunay.ijpiantanida.now.sh/)   
+![Delaunay Triangulation Example](./docs/logo.png)
 
-# Build
-For JS: `yarn js-watch`   
-For SASS: `yarn sass-watch`   
-To build everything: `yarn build`
+## Build
+To build everything: `yarn build`   
 
 ## Development
-Start any localserver in the project directory:   
-`localserver`
+Run `yarn js-watch` and `yarn sass-watch`.   
+Then `yarn start` to serve local directory
+
+## Deploy
+Deployed using [ZEIT Now](https://zeit.co/home).
