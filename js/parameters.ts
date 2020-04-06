@@ -40,7 +40,8 @@ export default class Parameters {
     this.densityInputEl.value = Config.parameters.density.toString()
     this.distanceInputEl.value = Config.parameters.minDistFactor.toString()
     this.fillInputEl.checked = Config.colors.fill
-    this.seedInputEl.value = sketch.random.seed
+    this.seedInputEl.placeholder = sketch.random.seed
+
     this.delaunayInputEl.checked = Config.parameters.delaunay
     this.mesherEnabledInputEl.checked = Config.imageMesh.enabled
 
@@ -54,7 +55,6 @@ export default class Parameters {
 
     this.parametersEl.querySelector("#redraw").addEventListener("click", this.onSetClick.bind(this))
     this.parametersEl.querySelector("#reset").addEventListener("click", this.onResetClick.bind(this))
-    this.parametersEl.querySelector("#snapshot").addEventListener("click", this.onSnapshotClick.bind(this))
     this.parametersEl.querySelector("#toggle-video").addEventListener("click", this.onToggleVideoClick.bind(this))
 
     sketch.onTriangulate(this.onSketchRender.bind(this))
@@ -75,7 +75,9 @@ export default class Parameters {
 
   onResetClick() {
     Config.parameters.delaunay = this.delaunayInputEl.checked
-    this.sketch.random.seed = this.seedInputEl.value
+    this.sketch.random.setSeed(this.seedInputEl.value)
+    this.seedInputEl.placeholder = this.sketch.random.seed
+
     const density = parseInt(this.densityInputEl.value)
     if (density > 0) {
       Config.parameters.density = density
@@ -93,17 +95,15 @@ export default class Parameters {
     this.trianglesCount.textContent = this.sketch.triangles.length.toString()
   }
 
-  onSnapshotClick() {
-    this.videoFeed.stopRecording()
-    this.videoFeed.snapshot()
-  }
-
   onToggleVideoClick() {
     this.videoFeed.toggleRecording()
+    this.fillInputEl.checked = true
+    this.mesherEnabledInputEl.checked = true
+    Config.colors.fill = true
+    Config.imageMesh.enabled = true
   }
 
   toggleParametersOpen() {
-    console.log("toggling", this.parametersEl.style.visibility)
     if (this.parametersEl.style.visibility == "hidden") {
       this.parametersEl.style.visibility = "inherit"
       this.openButtonEl.style.visibility = "hidden"

@@ -12,12 +12,9 @@ export default class VideoFeed {
     this.running = false
 
     this.videoEl = document.getElementById("video") as HTMLVideoElement
-
-    console.log("Going to ask for video")
   }
 
   snapshot() {
-    console.log("Snapshotting")
     this.imageMesher.drawInCanvas(this.videoEl)
   }
 

@@ -1,3 +1,5 @@
+@use "./reset.css";
+
 #sketch {
   background-color: #000;
 }
@@ -9,6 +11,10 @@
 #canvas {
   height: 100%;
   width: 100%;
+}
+
+#button {
+  background-color: white;
 }
 
 #parameters {

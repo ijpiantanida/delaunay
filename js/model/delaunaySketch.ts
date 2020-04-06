@@ -128,8 +128,6 @@ export default class DelaunaySketch {
   }
 
   reset() {
-    this.random.setSeed()
-
     Config.colors.gradient.precalculate(this.containerWidth)
 
     const {minDist2, nParticles} = this.calculateParametersFromCanvasSize()

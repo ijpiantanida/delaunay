@@ -13,7 +13,7 @@ export default class Line {
 
   draw(ctx: CanvasRenderingContext2D, sketch: Sketch) {
     ctx.beginPath()
-    ctx.lineWidth = 1 // I'd like to set with CSS
+    ctx.lineWidth = 1
     ctx.strokeStyle = Config.colors.lines
     ctx.moveTo(this.a.x, this.a.y)
     ctx.lineWidth = 2

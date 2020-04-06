@@ -6,11 +6,11 @@ export default class Random {
 
   constructor() {
     const urlParams = new URLSearchParams(window.location.search)
-    this.seed = urlParams.get("seed") || this.createSeed()
-    this.setSeed()
+    this.setSeed(urlParams.get("seed"))
   }
 
-  setSeed() {
+  setSeed(newSeed?: string) {
+    this.seed = newSeed || this.createSeed()
     this.rng = seedrandom(this.seed)
   }
 
