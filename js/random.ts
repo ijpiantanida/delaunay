@@ -1,7 +1,9 @@
 import seedrandom from "seedrandom"
 
 export default class Random {
-  private rng: seedrandom.prng
+  private rng: {
+    double(): number
+  }
   seed: string
 
   constructor() {
