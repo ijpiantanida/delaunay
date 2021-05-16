@@ -9,7 +9,7 @@ const Config = {
   },
   imageMesh: {
     enabled: false,
-    sourcePath: "/dist/img/king.jpg",
+    sourcePath: "img/king.jpg",
     sourceOpacity: 0
   },
   video: {

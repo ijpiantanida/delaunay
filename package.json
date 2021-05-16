@@ -7,7 +7,7 @@
   "scripts": {
     "build": "npm run sass && npm run js -- --mode=production",
     "deploy": "npm run build && now && now alias",
-    "sass": "node-sass -r -o dist styles | postcss dist/styles.css -u autoprefixer -r",
+    "sass": "node-sass -r -o public/build styles | postcss public/build/styles.css -u autoprefixer -r",
     "sass-watch": "watch 'npm run sass' styles",
     "js": "webpack",
     "js-watch": "webpack -w",

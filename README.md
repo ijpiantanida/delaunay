@@ -7,7 +7,7 @@
 2. Start build: `yarn js-watch` and `yarn sass-watch`.   
 3. `yarn start` to serve local directory
 
-> `yarn build` to build production version of JS and SASS to `/dist`
+> `yarn build` to build production version of JS and SASS to `/public`
 
 ## Demo Deploy    
 - Deployed using [ZEIT Now](https://zeit.co/home).
